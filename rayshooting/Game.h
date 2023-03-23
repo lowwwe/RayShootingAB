@@ -25,6 +25,10 @@ private:
 
 	void processEvents();
 	void processKeys(sf::Event t_event);
+	void processMouseUp(sf::Event t_event);
+	void processMouseDown(sf::Event t_event);
+	void processMouseMove(sf::Event t_event);
+	void processMouseWheel(sf::Event t_event);
 	void update(sf::Time t_deltaTime);
 	void render();
 	
@@ -38,6 +42,11 @@ private:
 	sf::Sprite m_targetSprite; // sprite used for sfml logo
 	bool m_exitGame; // control exiting game
 
+	sf::Vector2f m_lineStart;
+	sf::Vector2f m_lineEnd;
+	bool m_dragging{ false };
+
+	sf::VertexArray m_line{sf::Lines};
 };
 
 #endif // !GAME_HPP

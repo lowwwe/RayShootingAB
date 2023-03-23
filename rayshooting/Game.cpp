@@ -69,14 +69,31 @@ void Game::processEvents()
 	sf::Event newEvent;
 	while (m_window.pollEvent(newEvent))
 	{
-		if ( sf::Event::Closed == newEvent.type) // window message
+		switch (newEvent.type)
 		{
+		case sf::Event::Closed:
 			m_exitGame = true;
-		}
-		if (sf::Event::KeyPressed == newEvent.type) //user pressed a key
-		{
+			break;
+		case sf::Event::KeyPressed:
 			processKeys(newEvent);
+			break;
+		case sf::Event::MouseButtonPressed:
+			processMouseDown(newEvent);
+			break;
+		case sf::Event::MouseButtonReleased:
+			processMouseUp(newEvent);
+			break;
+		case sf::Event::MouseMoved:
+			processMouseMove(newEvent);
+			break;
+		case sf::Event::MouseWheelMoved:
+			processMouseWheel(newEvent);
+			break;
+		default:
+			break;
 		}
+		
+
 	}
 }
 
@@ -91,6 +108,46 @@ void Game::processKeys(sf::Event t_event)
 	{
 		m_exitGame = true;
 	}
+}
+
+void Game::processMouseUp(sf::Event t_event)
+{
+	m_dragging = false;
+}
+
+void Game::processMouseDown(sf::Event t_event)
+{
+	sf::Vertex point;
+	if (sf::Mouse::Button::Left == t_event.mouseButton.button)
+	{
+		m_lineStart.x = static_cast<float>(t_event.mouseButton.x);
+		m_lineStart.y = static_cast<float>(t_event.mouseButton.y);
+		m_lineEnd.x = static_cast<float>(t_event.mouseButton.x);
+		m_lineEnd.y = static_cast<float>(t_event.mouseButton.y);
+		m_line.clear();
+		point.color = sf::Color::Black;
+		point.position = m_lineStart;
+		m_line.append(point);
+		point.position = m_lineEnd;
+		m_line.append(point);
+		m_dragging = true;
+	}
+
+}
+
+void Game::processMouseMove(sf::Event t_event)
+{
+	if(m_dragging)
+	{
+		m_lineEnd.x = static_cast<float>(t_event.mouseMove.x);
+		m_lineEnd.y = static_cast<float>(t_event.mouseMove.y);
+		m_line[1].position = m_lineEnd;
+	}
+}
+
+void Game::processMouseWheel(sf::Event t_event)
+{
+
 }
 
 /// <summary>
@@ -113,6 +170,7 @@ void Game::render()
 	m_window.clear(sf::Color::White);
 	m_window.draw(m_instructionsMessage);
 	m_window.draw(m_targetSprite);
+	m_window.draw(m_line);
 	m_window.display();
 }
 
