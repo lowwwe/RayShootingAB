@@ -112,12 +112,29 @@ void Game::processKeys(sf::Event t_event)
 
 void Game::processMouseUp(sf::Event t_event)
 {
+	m_aiming = false;
 	m_dragging = false;
+	if (sf::Mouse::Button::Left == t_event.mouseButton.button)
+	{
+		m_ray.slope = (m_lineEnd.y - m_lineStart.y) / (m_lineEnd.x - m_lineStart.x);
+		m_ray.interceptY = m_lineStart.y - m_ray.slope * m_lineStart.x;
+
+		if (simpleRayCheck(m_ray, m_targetSprite))
+		{
+			m_instructionsMessage.setOutlineColor(sf::Color::Red);
+		}
+		else
+		{
+			m_instructionsMessage.setOutlineColor(sf::Color::Green);
+		}
+	}
 }
 
 void Game::processMouseDown(sf::Event t_event)
 {
 	sf::Vertex point;
+	m_lineStart.x = static_cast<float>(t_event.mouseButton.x);
+	m_lineStart.y = static_cast<float>(t_event.mouseButton.y);
 	if (sf::Mouse::Button::Left == t_event.mouseButton.button)
 	{
 		m_lineStart.x = static_cast<float>(t_event.mouseButton.x);
@@ -130,18 +147,31 @@ void Game::processMouseDown(sf::Event t_event)
 		m_line.append(point);
 		point.position = m_lineEnd;
 		m_line.append(point);
-		m_dragging = true;
+		m_aiming = true;
+	}
+	if (sf::Mouse::Button::Right == t_event.mouseButton.button)
+	{
+		if (m_targetSprite.getGlobalBounds().contains(m_lineStart))
+		{
+			m_dragOffset = m_targetSprite.getPosition() - m_lineStart;
+			m_dragging = true;
+		}
 	}
 
 }
 
 void Game::processMouseMove(sf::Event t_event)
 {
-	if(m_dragging)
+	if(m_aiming)
 	{
 		m_lineEnd.x = static_cast<float>(t_event.mouseMove.x);
 		m_lineEnd.y = static_cast<float>(t_event.mouseMove.y);
 		m_line[1].position = m_lineEnd;
+	}
+	if (m_dragging)
+	{
+		m_targetSprite.setPosition(static_cast<float>(t_event.mouseMove.x) + m_dragOffset.x,
+			static_cast<float>(t_event.mouseMove.y + m_dragOffset.y));
 	}
 }
 
@@ -171,7 +201,41 @@ void Game::render()
 	m_window.draw(m_instructionsMessage);
 	m_window.draw(m_targetSprite);
 	m_window.draw(m_line);
+	m_window.draw(m_checkpoints);
 	m_window.display();
+}
+
+bool Game::simpleRayCheck(MyLine t_line, sf::Sprite t_target)
+{
+	bool result = false;
+	int steps{ 20 };
+	sf::FloatRect target;
+	target = t_target.getGlobalBounds();
+	float startX = target.left;
+	float endX = startX + target.width;
+	float minY = target.top;
+	float maxY = minY + target.height;
+	float increment = target.width / steps; // precision
+	float y;
+	float x;
+
+	sf::Vertex point;
+	point.color = sf::Color::Red;
+	m_checkpoints.clear();
+	for (int i = 0; i < steps; i++)
+	{
+		x = startX + (i * increment);
+		y = x * t_line.slope + t_line.interceptY;
+		point.position.x = x;
+		point.position.y = y;
+		m_checkpoints.append(point);
+		if( y >= minY && y <= maxY)
+		{
+			result = true;
+		}
+	}
+
+	return result;
 }
 
 /// <summary>

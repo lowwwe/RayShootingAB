@@ -10,6 +10,7 @@
 /// Don't forget the endif at the bottom
 /// </summary>
 #include <SFML/Graphics.hpp>
+#include "MyLine.h"
 
 class Game
 {
@@ -31,7 +32,9 @@ private:
 	void processMouseWheel(sf::Event t_event);
 	void update(sf::Time t_deltaTime);
 	void render();
-	
+	bool simpleRayCheck(MyLine t_line, sf::Sprite t_target);
+
+
 	void setupFontAndText();
 	void setupSprite();
 
@@ -44,9 +47,14 @@ private:
 
 	sf::Vector2f m_lineStart;
 	sf::Vector2f m_lineEnd;
+	bool m_aiming{ false };
 	bool m_dragging{ false };
+	sf::Vector2f m_dragOffset;
 
 	sf::VertexArray m_line{sf::Lines};
+
+	sf::VertexArray m_checkpoints{ sf::Lines };
+	MyLine m_ray;
 };
 
 #endif // !GAME_HPP
