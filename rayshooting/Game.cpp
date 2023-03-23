@@ -111,8 +111,8 @@ void Game::update(sf::Time t_deltaTime)
 void Game::render()
 {
 	m_window.clear(sf::Color::White);
-	m_window.draw(m_welcomeMessage);
-	m_window.draw(m_logoSprite);
+	m_window.draw(m_instructionsMessage);
+	m_window.draw(m_targetSprite);
 	m_window.display();
 }
 
@@ -125,14 +125,14 @@ void Game::setupFontAndText()
 	{
 		std::cout << "problem loading arial black font" << std::endl;
 	}
-	m_welcomeMessage.setFont(m_ArialBlackfont);
-	m_welcomeMessage.setString("SFML Game");
-	m_welcomeMessage.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
-	m_welcomeMessage.setPosition(40.0f, 40.0f);
-	m_welcomeMessage.setCharacterSize(80U);
-	m_welcomeMessage.setOutlineColor(sf::Color::Red);
-	m_welcomeMessage.setFillColor(sf::Color::Black);
-	m_welcomeMessage.setOutlineThickness(3.0f);
+	m_instructionsMessage.setFont(m_ArialBlackfont);
+	m_instructionsMessage.setString("left click and drag for shooting line\nright click to move target\nwheel to rotate");
+
+	m_instructionsMessage.setPosition(40.0f, 40.0f);
+	m_instructionsMessage.setCharacterSize(20U);
+	m_instructionsMessage.setOutlineColor(sf::Color::Red);
+	m_instructionsMessage.setFillColor(sf::Color::Black);
+	m_instructionsMessage.setOutlineThickness(1.0f);
 
 }
 
@@ -141,11 +141,12 @@ void Game::setupFontAndText()
 /// </summary>
 void Game::setupSprite()
 {
-	if (!m_logoTexture.loadFromFile("ASSETS\\IMAGES\\SFML-LOGO.png"))
+	if (!m_targetTexture.loadFromFile("ASSETS\\IMAGES\\target.jpg"))
 	{
 		// simple error message if previous call fails
 		std::cout << "problem loading logo" << std::endl;
 	}
-	m_logoSprite.setTexture(m_logoTexture);
-	m_logoSprite.setPosition(300.0f, 180.0f);
+	m_targetSprite.setTexture(m_targetTexture);
+	m_targetSprite.setPosition(400.0f, 280.0f);
+	m_targetSprite.setScale(0.5f, 0.5f);
 }
