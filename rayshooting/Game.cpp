@@ -17,7 +17,7 @@
 /// load and setup thne image
 /// </summary>
 Game::Game() :
-	m_window{ sf::VideoMode{ 800U, 600U, 32U }, "SFML Game" },
+	m_window{ sf::VideoMode{ 1100U, 900U, 32U }, "SFML Game" },
 	m_exitGame{false} //when true game will exit
 {
 	setupFontAndText(); // load font 
@@ -302,12 +302,12 @@ bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	sf::Vector2f end;
 	sf::Vector2f crossOver;
 	sf::Vertex point;
-	
+	float hypothenus;
 	m_checkpoints.clear();
 	point.color = sf::Color::Cyan;
 	start = t_target.getPosition();
 	end.x = start.x + target.width * std::cos(angleRad);
-	end.y = start.y + target.height * std::sin(angleRad);
+	end.y = start.y + target.width * std::sin(angleRad);
 	point.position = start;
 	m_checkpoints.append(point);
 	point.position = end;
@@ -319,6 +319,27 @@ bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	{
 		return true;
 	}
+
+	m_checkpoints.clear();
+	
+	hypothenus = std::sqrt(target.height * target.height + target.width * target.width);
+
+
+	point.color = sf::Color::Magenta;
+	end.x = start.x - target.width * std::cos(1.5708 - angleRad);
+	end.y = start.y + target.height - target.width * std::sin(1.5708 - angleRad);
+	point.position = start;
+	m_checkpoints.append(point);
+	point.position = end;
+	m_checkpoints.append(point);
+	line =  MyLine{ start,end };
+	crossOver = line.intersection(t_line);
+	m_intersection.setPosition(crossOver);
+	if (crossOver.x >= start.x && crossOver.x <= end.x) // bottom edge
+	{
+		return true;
+	}
+
 	return false;
 }
 
@@ -354,7 +375,7 @@ void Game::setupSprite()
 	}
 	m_targetSprite.setTexture(m_targetTexture);
 	m_targetSprite.setPosition(400.0f, 280.0f);
-	m_targetSprite.setScale(0.5f, 0.5f);
+
 
 	m_intersection.setFillColor(sf::Color::Red);
 }
