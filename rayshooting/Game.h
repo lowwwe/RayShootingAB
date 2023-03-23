@@ -33,8 +33,8 @@ private:
 	void update(sf::Time t_deltaTime);
 	void render();
 	bool simpleRayCheck(MyLine t_line, sf::Sprite t_target);
-
-
+	bool orthogonalIntersectionCheck(MyLine t_line, sf::Sprite t_target);
+	bool rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target);
 	void setupFontAndText();
 	void setupSprite();
 
@@ -55,6 +55,8 @@ private:
 
 	sf::VertexArray m_checkpoints{ sf::Lines };
 	MyLine m_ray;
+
+	sf::CircleShape m_intersection{ 5.0f };
 };
 
 #endif // !GAME_HPP

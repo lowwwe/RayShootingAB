@@ -116,10 +116,10 @@ void Game::processMouseUp(sf::Event t_event)
 	m_dragging = false;
 	if (sf::Mouse::Button::Left == t_event.mouseButton.button)
 	{
-		m_ray.slope = (m_lineEnd.y - m_lineStart.y) / (m_lineEnd.x - m_lineStart.x);
-		m_ray.interceptY = m_lineStart.y - m_ray.slope * m_lineStart.x;
-
-		if (simpleRayCheck(m_ray, m_targetSprite))
+		m_ray = MyLine{ m_lineStart, m_lineEnd };
+	
+		//if (simpleRayCheck(m_ray, m_targetSprite))
+		if(orthogonalIntersectionCheck(m_ray, m_targetSprite))
 		{
 			m_instructionsMessage.setOutlineColor(sf::Color::Red);
 		}
@@ -177,7 +177,14 @@ void Game::processMouseMove(sf::Event t_event)
 
 void Game::processMouseWheel(sf::Event t_event)
 {
-
+	if (t_event.mouseWheel.delta > 0)
+	{
+		m_targetSprite.setRotation(m_targetSprite.getRotation() + 1.0f);
+	}
+	else
+	{
+		m_targetSprite.setRotation(m_targetSprite.getRotation() - 2.0f);
+	}
 }
 
 /// <summary>
@@ -202,13 +209,14 @@ void Game::render()
 	m_window.draw(m_targetSprite);
 	m_window.draw(m_line);
 	m_window.draw(m_checkpoints);
+	m_window.draw(m_intersection);
 	m_window.display();
 }
 
 bool Game::simpleRayCheck(MyLine t_line, sf::Sprite t_target)
 {
 	bool result = false;
-	int steps{ 20 };
+	int steps{ 50 };
 	sf::FloatRect target;
 	target = t_target.getGlobalBounds();
 	float startX = target.left;
@@ -238,6 +246,56 @@ bool Game::simpleRayCheck(MyLine t_line, sf::Sprite t_target)
 	return result;
 }
 
+bool Game::orthogonalIntersectionCheck(MyLine t_line, sf::Sprite t_target)
+{
+	bool result = false;
+	sf::FloatRect target = t_target.getGlobalBounds();
+	sf::Vector2f start;
+	sf::Vector2f end;
+	sf::Vector2f crossOver;
+	
+	start.x = target.left;
+	start.y = target.top;
+	end.x = start.x + target.width;
+	end.y = start.y + target.height;
+	crossOver.y = start.y;
+	crossOver.x = (start.y - t_line.interceptY) / t_line.slope;
+	m_intersection.setPosition(crossOver);
+	if (crossOver.x >= start.x && crossOver.x <= end.x) // top edge
+	{
+		return true;
+	}
+	crossOver.y = end.y;
+	crossOver.x = (end.y - t_line.interceptY) / t_line.slope;
+	m_intersection.setPosition(crossOver);
+	if (crossOver.x >= start.x && crossOver.x <= end.x) // bottom edge
+	{
+		return true;
+	}
+	start.y = target.top;
+	crossOver = sf::Vector2f(end.x, end.x * t_line.slope + t_line.interceptY);
+	m_intersection.setPosition(crossOver);
+	if (crossOver.y >= start.y && crossOver.y <= end.y) // right edge
+	{
+		return true;
+	}
+
+
+	crossOver = sf::Vector2f(start.x, start.x * t_line.slope + t_line.interceptY);
+	m_intersection.setPosition(crossOver);
+	if (crossOver.y >= start.y && crossOver.y <= end.y) // left edge
+	{
+		return true;
+	}
+
+	return result;
+}
+
+bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
+{
+	return false;
+}
+
 /// <summary>
 /// load the font and setup the text message for screen
 /// </summary>
@@ -248,11 +306,11 @@ void Game::setupFontAndText()
 		std::cout << "problem loading arial black font" << std::endl;
 	}
 	m_instructionsMessage.setFont(m_ArialBlackfont);
-	m_instructionsMessage.setString("left click and drag for shooting line\nright click to move target\nwheel to rotate");
+	m_instructionsMessage.setString("left click and drag for shooting line\nright click to move target\nwheel to rotate\n green for a miss , red for a hit");
 
 	m_instructionsMessage.setPosition(40.0f, 40.0f);
 	m_instructionsMessage.setCharacterSize(20U);
-	m_instructionsMessage.setOutlineColor(sf::Color::Red);
+	m_instructionsMessage.setOutlineColor(sf::Color::Green);
 	m_instructionsMessage.setFillColor(sf::Color::Black);
 	m_instructionsMessage.setOutlineThickness(1.0f);
 
@@ -271,4 +329,6 @@ void Game::setupSprite()
 	m_targetSprite.setTexture(m_targetTexture);
 	m_targetSprite.setPosition(400.0f, 280.0f);
 	m_targetSprite.setScale(0.5f, 0.5f);
+
+	m_intersection.setFillColor(sf::Color::Red);
 }
