@@ -119,7 +119,8 @@ void Game::processMouseUp(sf::Event t_event)
 		m_ray = MyLine{ m_lineStart, m_lineEnd };
 	
 		//if (simpleRayCheck(m_ray, m_targetSprite))
-		if(orthogonalIntersectionCheck(m_ray, m_targetSprite))
+		//if(orthogonalIntersectionCheck(m_ray, m_targetSprite))
+		if(rotatedIntersectionCheck(m_ray, m_targetSprite))
 		{
 			m_instructionsMessage.setOutlineColor(sf::Color::Red);
 		}
@@ -179,7 +180,7 @@ void Game::processMouseWheel(sf::Event t_event)
 {
 	if (t_event.mouseWheel.delta > 0)
 	{
-		m_targetSprite.setRotation(m_targetSprite.getRotation() + 1.0f);
+		m_targetSprite.setRotation(m_targetSprite.getRotation() + 2.0f);
 	}
 	else
 	{
@@ -293,6 +294,31 @@ bool Game::orthogonalIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 
 bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 {
+	float angle = t_target.getRotation();
+	float angleRad = angle / 180  * 3.14159265359f;
+	bool result = false;
+	sf::FloatRect target = t_target.getLocalBounds();
+	sf::Vector2f start;
+	sf::Vector2f end;
+	sf::Vector2f crossOver;
+	sf::Vertex point;
+	
+	m_checkpoints.clear();
+	point.color = sf::Color::Cyan;
+	start = t_target.getPosition();
+	end.x = start.x + target.width * std::cos(angleRad);
+	end.y = start.y + target.height * std::sin(angleRad);
+	point.position = start;
+	m_checkpoints.append(point);
+	point.position = end;
+	m_checkpoints.append(point);
+	MyLine line{ start,end };
+	crossOver = line.intersection(t_line);
+	m_intersection.setPosition(crossOver);
+	if (crossOver.x >= start.x && crossOver.x <= end.x) // top edge
+	{
+		return true;
+	}
 	return false;
 }
 
