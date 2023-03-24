@@ -50,7 +50,14 @@ sf::Vector2f MyLine::intersection(MyLine t_line)
 /// <returns>y coordinate</returns>
 float MyLine::findY(float t_x)
 {
-	return  (C - A*t_x)/B; // new implementatikon
+	if (B != 0.0f)
+	{
+		return  (C - A * t_x) / B; // new implementatikon
+	}
+	else
+	{
+		return -1.0f;
+	}
 	return slope * t_x + interceptY; // never happen now
 ;
 }
@@ -62,7 +69,14 @@ float MyLine::findY(float t_x)
 /// <returns>x coordinate</returns>
 float MyLine::findX(float t_y)
 {
-	return (C - B * t_y) / A;// new implementatikon
+	if (A != 0.0f)
+	{
+		return (C - B * t_y) / A;// new implementatikon
+	}
+	else
+	{
+		return -1.0f;
+	}
 	return (t_y - interceptY) / slope;// never happen now
-	;
+	
 }
