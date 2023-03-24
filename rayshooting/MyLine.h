@@ -7,6 +7,9 @@ class MyLine
 public:
 	float slope{0.0f};
 	float interceptY{0.0f};
+	float A;
+	float B;
+	float C;
 	
 	MyLine();
 	MyLine(sf::Vector2f t_start, sf::Vector2f t_end);

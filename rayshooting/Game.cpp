@@ -132,9 +132,9 @@ void Game::processMouseUp(sf::Event t_event)
 			don't NOT rotate sprite with last one
 		*/
 
-		if (simpleRayCheck(m_ray, m_targetSprite))
+		//if (simpleRayCheck(m_ray, m_targetSprite))
 		//if(orthogonalIntersectionCheck(m_ray, m_targetSprite))
-		//if(rotatedIntersectionCheck(m_ray, m_targetSprite))
+		if(rotatedIntersectionCheck(m_ray, m_targetSprite))
 		{
 			m_instructionsMessage.setOutlineColor(sf::Color::Red);
 		}

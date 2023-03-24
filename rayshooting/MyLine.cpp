@@ -13,6 +13,9 @@ MyLine::MyLine(sf::Vector2f t_start, sf::Vector2f t_end)
 {
 	slope = (t_end.y - t_start.y) / (t_end.x - t_start.x);
 	interceptY = t_start.y - slope * t_start.x;
+	A = t_end.y - t_start.y;
+	B = t_start.x - t_end.x;
+	C = A * t_start.x + B * t_start.y;
 }
 
 /// <summary>
@@ -25,6 +28,17 @@ sf::Vector2f MyLine::intersection(MyLine t_line)
 	sf::Vector2f point;
 	point.x = (t_line.interceptY - interceptY) / (slope - t_line.slope);
 	point.y = point.x * slope + interceptY;
+
+	float determinant = A * t_line.B - t_line.A * B;
+	if (determinant != 0)
+	{
+		point.x = (t_line.B * C - B * t_line.C) / determinant;
+		point.y = (A * t_line.C - t_line.A * C) / determinant;
+	}
+	else
+	{
+		return sf::Vector2f{ -1.0f,-1.0f };
+	}
 	return point;
 }
 
