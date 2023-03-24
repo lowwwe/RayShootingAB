@@ -20,3 +20,13 @@ sf::Vector2f MyLine::intersection(MyLine t_line)
 	point.y = point.x * slope + interceptY;
 	return point;
 }
+
+float MyLine::findY(float t_x)
+{
+	return slope * t_x + interceptY;
+}
+
+float MyLine::findX(float t_y)
+{
+	return (t_y - interceptY) / slope;
+}

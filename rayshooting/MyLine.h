@@ -11,4 +11,6 @@ public:
 	MyLine();
 	MyLine(sf::Vector2f t_start, sf::Vector2f t_end);
 	sf::Vector2f intersection(MyLine t_line);
+	float findY(float t_x);
+	float findX(float t_y);
 };

@@ -119,8 +119,8 @@ void Game::processMouseUp(sf::Event t_event)
 		m_ray = MyLine{ m_lineStart, m_lineEnd };
 	
 		//if (simpleRayCheck(m_ray, m_targetSprite))
-		//if(orthogonalIntersectionCheck(m_ray, m_targetSprite))
-		if(rotatedIntersectionCheck(m_ray, m_targetSprite))
+		if(orthogonalIntersectionCheck(m_ray, m_targetSprite))
+		//if(rotatedIntersectionCheck(m_ray, m_targetSprite))
 		{
 			m_instructionsMessage.setOutlineColor(sf::Color::Red);
 		}
@@ -234,7 +234,7 @@ bool Game::simpleRayCheck(MyLine t_line, sf::Sprite t_target)
 	for (int i = 0; i < steps; i++)
 	{
 		x = startX + (i * increment);
-		y = x * t_line.slope + t_line.interceptY;
+		y = t_line.findY(x);
 		point.position.x = x;
 		point.position.y = y;
 		m_checkpoints.append(point);
@@ -260,14 +260,14 @@ bool Game::orthogonalIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	end.x = start.x + target.width;
 	end.y = start.y + target.height;
 	crossOver.y = start.y;
-	crossOver.x = (start.y - t_line.interceptY) / t_line.slope;
+	crossOver.x = t_line.findX(start.y);
 	m_intersection.setPosition(crossOver);
 	if (crossOver.x >= start.x && crossOver.x <= end.x) // top edge
 	{
 		return true;
 	}
 	crossOver.y = end.y;
-	crossOver.x = (end.y - t_line.interceptY) / t_line.slope;
+	crossOver.x = t_line.findX(end.y);
 	m_intersection.setPosition(crossOver);
 	if (crossOver.x >= start.x && crossOver.x <= end.x) // bottom edge
 	{
@@ -281,8 +281,8 @@ bool Game::orthogonalIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 		return true;
 	}
 
-
-	crossOver = sf::Vector2f(start.x, start.x * t_line.slope + t_line.interceptY);
+	
+	crossOver = sf::Vector2f(start.x, t_line.findY(start.x));
 	m_intersection.setPosition(crossOver);
 	if (crossOver.y >= start.y && crossOver.y <= end.y) // left edge
 	{
@@ -301,6 +301,7 @@ bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	sf::Vector2f start;
 	sf::Vector2f end;
 	sf::Vector2f crossOver;
+	sf::Vector2f lastEnd;
 	sf::Vertex point;
 	float hypothenus;
 	m_checkpoints.clear();
@@ -323,11 +324,11 @@ bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	m_checkpoints.clear();
 	
 	hypothenus = std::sqrt(target.height * target.height + target.width * target.width);
-
+	float diagonalAngle = std::atan2(target.height, target.width);
 
 	point.color = sf::Color::Magenta;
-	end.x = start.x - target.width * std::cos(1.5708 - angleRad);
-	end.y = start.y + target.height - target.width * std::sin(1.5708 - angleRad);
+	end.x = start.x + target.height * std::cos(angleRad + M_PI_2);
+	end.y = start.y + target.height * std::sin(angleRad + M_PI_2);
 	point.position = start;
 	m_checkpoints.append(point);
 	point.position = end;
@@ -335,11 +336,27 @@ bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	line =  MyLine{ start,end };
 	crossOver = line.intersection(t_line);
 	m_intersection.setPosition(crossOver);
+	if (crossOver.y >= start.y && crossOver.y <= end.y) // bottom edge
+	{
+		return true;
+	}
+	m_checkpoints.clear();
+	lastEnd = end;
+	point.color = sf::Color::Blue;
+	end.x = start.x + hypothenus * std::cos(angleRad + diagonalAngle);
+	end.y = start.y + hypothenus * std::sin(angleRad + diagonalAngle);
+	start = lastEnd;
+	point.position = start;
+	m_checkpoints.append(point);
+	point.position = end;
+	m_checkpoints.append(point);
+	line = MyLine{ start,end };
+	crossOver = line.intersection(t_line);
+	m_intersection.setPosition(crossOver);
 	if (crossOver.x >= start.x && crossOver.x <= end.x) // bottom edge
 	{
 		return true;
 	}
-
 	return false;
 }
 
@@ -376,6 +393,6 @@ void Game::setupSprite()
 	m_targetSprite.setTexture(m_targetTexture);
 	m_targetSprite.setPosition(400.0f, 280.0f);
 
-
 	m_intersection.setFillColor(sf::Color::Red);
+	m_intersection.setOrigin(5.0f, 5.0f);
 }

@@ -10,7 +10,12 @@
 /// Don't forget the endif at the bottom
 /// </summary>
 #include <SFML/Graphics.hpp>
+#define  _USE_MATH_DEFINES
+#include <math.h>
 #include "MyLine.h"
+
+
+
 
 class Game
 {
