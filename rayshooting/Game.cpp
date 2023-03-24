@@ -21,10 +21,10 @@
 /// default constructor
 /// setup the window properties
 /// load and setup the text 
-/// load and setup thne image
+/// load and setup the image
 /// </summary>
 Game::Game() :
-	m_window{ sf::VideoMode{ 1100U, 900U, 32U }, "SFML Game" },
+	m_window{ sf::VideoMode{ 1100U, 900U, 32U }, "SFML ray firing" },
 	m_exitGame{false} //when true game will exit
 {
 	setupFontAndText(); // load font 
@@ -127,12 +127,13 @@ void Game::processMouseUp(sf::Event t_event)
 	
 
 		/*
-			choose one don't rotate sprite with first two
+			choose one if statment
+			don't rotate sprite with first two
 			don't NOT rotate sprite with last one
 		*/
 
-		//if (simpleRayCheck(m_ray, m_targetSprite))
-		if(orthogonalIntersectionCheck(m_ray, m_targetSprite))
+		if (simpleRayCheck(m_ray, m_targetSprite))
+		//if(orthogonalIntersectionCheck(m_ray, m_targetSprite))
 		//if(rotatedIntersectionCheck(m_ray, m_targetSprite))
 		{
 			m_instructionsMessage.setOutlineColor(sf::Color::Red);
