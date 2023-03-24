@@ -129,7 +129,7 @@ void Game::processMouseUp(sf::Event t_event)
 		/*
 			choose one if statment
 			don't rotate sprite with first two
-			don't NOT rotate sprite with last one
+			rotate the sprite with last one
 		*/
 
 		//if (simpleRayCheck(m_ray, m_targetSprite))
