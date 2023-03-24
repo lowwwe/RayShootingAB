@@ -1,8 +1,15 @@
 /// <summary>
 /// @author Peter Lowe
-/// @date May 2019
+/// @date MArch 2023
 ///
-/// you need to change the above lines or lose marks
+/// change the if statement in processMouseUp method
+/// to check out the different methods
+/// 
+/// uses y = mx + c
+/// for line equation but has problems with vertical lines where m is infinite
+/// 
+/// a better solution would be to use
+/// ax + by = c
 /// </summary>
 
 #include "Game.h"
@@ -118,6 +125,12 @@ void Game::processMouseUp(sf::Event t_event)
 	{
 		m_ray = MyLine{ m_lineStart, m_lineEnd };
 	
+
+		/*
+			choose one don't rotate sprite with first two
+			don't NOT rotate sprite with last one
+		*/
+
 		//if (simpleRayCheck(m_ray, m_targetSprite))
 		if(orthogonalIntersectionCheck(m_ray, m_targetSprite))
 		//if(rotatedIntersectionCheck(m_ray, m_targetSprite))
@@ -214,6 +227,14 @@ void Game::render()
 	m_window.display();
 }
 
+
+/// <summary>
+/// take a number of samples inside the x range
+/// and check if the point is inside the box
+/// </summary>
+/// <param name="t_line">ray cast line</param>
+/// <param name="t_target">sprite target</param>
+/// <returns>true if hit</returns>
 bool Game::simpleRayCheck(MyLine t_line, sf::Sprite t_target)
 {
 	bool result = false;
@@ -247,6 +268,14 @@ bool Game::simpleRayCheck(MyLine t_line, sf::Sprite t_target)
 	return result;
 }
 
+/// <summary>
+/// orthogonal check
+/// 
+/// don't shoot exactly vertically
+/// </summary>
+/// <param name="t_line">shooting line</param>
+/// <param name="t_target">target sprite</param>
+/// <returns>true if hit</returns>
 bool Game::orthogonalIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 {
 	bool result = false;
@@ -266,6 +295,7 @@ bool Game::orthogonalIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	{
 		return true;
 	}
+	
 	crossOver.y = end.y;
 	crossOver.x = t_line.findX(end.y);
 	m_intersection.setPosition(crossOver);
@@ -273,6 +303,7 @@ bool Game::orthogonalIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	{
 		return true;
 	}
+	
 	start.y = target.top;
 	crossOver = sf::Vector2f(end.x, end.x * t_line.slope + t_line.interceptY);
 	m_intersection.setPosition(crossOver);
@@ -288,10 +319,18 @@ bool Game::orthogonalIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	{
 		return true;
 	}
-
+	
 	return result;
 }
 
+
+/// <summary>
+/// check rotated sprite must be skew
+/// only check 3 side, what goes in must come out
+/// </summary>
+/// <param name="t_line">ray cast line</param>
+/// <param name="t_target">target sprite</param>
+/// <returns>true if hit</returns>
 bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 {
 	float angle = t_target.getRotation();
@@ -302,17 +341,12 @@ bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	sf::Vector2f end;
 	sf::Vector2f crossOver;
 	sf::Vector2f lastEnd;
-	sf::Vertex point;
+	
 	float hypothenus;
-	m_checkpoints.clear();
-	point.color = sf::Color::Cyan;
+	
 	start = t_target.getPosition();
 	end.x = start.x + target.width * std::cos(angleRad);
 	end.y = start.y + target.width * std::sin(angleRad);
-	point.position = start;
-	m_checkpoints.append(point);
-	point.position = end;
-	m_checkpoints.append(point);
 	MyLine line{ start,end };
 	crossOver = line.intersection(t_line);
 	m_intersection.setPosition(crossOver);
@@ -321,18 +355,12 @@ bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 		return true;
 	}
 
-	m_checkpoints.clear();
 	
 	hypothenus = std::sqrt(target.height * target.height + target.width * target.width);
 	float diagonalAngle = std::atan2(target.height, target.width);
 
-	point.color = sf::Color::Magenta;
 	end.x = start.x + target.height * std::cos(angleRad + M_PI_2);
 	end.y = start.y + target.height * std::sin(angleRad + M_PI_2);
-	point.position = start;
-	m_checkpoints.append(point);
-	point.position = end;
-	m_checkpoints.append(point);
 	line =  MyLine{ start,end };
 	crossOver = line.intersection(t_line);
 	m_intersection.setPosition(crossOver);
@@ -340,16 +368,10 @@ bool Game::rotatedIntersectionCheck(MyLine t_line, sf::Sprite t_target)
 	{
 		return true;
 	}
-	m_checkpoints.clear();
 	lastEnd = end;
-	point.color = sf::Color::Blue;
 	end.x = start.x + hypothenus * std::cos(angleRad + diagonalAngle);
 	end.y = start.y + hypothenus * std::sin(angleRad + diagonalAngle);
 	start = lastEnd;
-	point.position = start;
-	m_checkpoints.append(point);
-	point.position = end;
-	m_checkpoints.append(point);
 	line = MyLine{ start,end };
 	crossOver = line.intersection(t_line);
 	m_intersection.setPosition(crossOver);
