@@ -28,7 +28,7 @@ sf::Vector2f MyLine::intersection(MyLine t_line)
 	sf::Vector2f point;
 	point.x = (t_line.interceptY - interceptY) / (slope - t_line.slope);
 	point.y = point.x * slope + interceptY;
-
+	// orignal point never happen now 
 	float determinant = A * t_line.B - t_line.A * B;
 	if (determinant != 0)
 	{
@@ -50,7 +50,9 @@ sf::Vector2f MyLine::intersection(MyLine t_line)
 /// <returns>y coordinate</returns>
 float MyLine::findY(float t_x)
 {
-	return slope * t_x + interceptY;
+	return  (C - A*t_x)/B; // new implementatikon
+	return slope * t_x + interceptY; // never happen now
+;
 }
 
 /// <summary>
@@ -60,5 +62,7 @@ float MyLine::findY(float t_x)
 /// <returns>x coordinate</returns>
 float MyLine::findX(float t_y)
 {
-	return (t_y - interceptY) / slope;
+	return (C - B * t_y) / A;// new implementatikon
+	return (t_y - interceptY) / slope;// never happen now
+	;
 }
